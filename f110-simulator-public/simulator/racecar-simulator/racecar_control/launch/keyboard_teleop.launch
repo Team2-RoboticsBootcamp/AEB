@@ -1,0 +1,12 @@
+<launch>
+  <!-- Load the Keyboard node -->
+  <node pkg ="racecar_control" type="keyboard_teleop.py" name="key_teleop" output="screen" >
+    <param name="forward_rate" value="0.1" />
+    <param name="rotation_rate" value="0.15" />
+    <remap from="key_vel" to="/key_teleop/cmd_vel" />
+  </node>
+
+  <!-- transform these vel msgs to robot commands via the twist2ack node -->
+  <node name="twist2ack" pkg="racecar_control" type="twist2ack.py" respawn="true" output="screen"/>
+
+</launch>

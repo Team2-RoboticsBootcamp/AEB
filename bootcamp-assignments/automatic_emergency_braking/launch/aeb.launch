@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+
+ <!-- TO-DO: Bring up the simulator and the code -->
+
+<!-- Bring up the simulator with race_car wall world -->
+  <include file="$(find racecar_gazebo)/launch/racecar.launch">
+    <arg name="world_name" value="racecar_wall"/>
+  </include>
+
+<!-- Bring up AEB code -->
+  <node pkg="automatic_emergency_braking" name="aeb_controller" type="sae_aeb_SS.py" output="screen"/>
+  <!-- <node pkg="automatic_emergency_braking" name="plotter" type="plotter.py" output="screen"/> -->
+
+</launch>
