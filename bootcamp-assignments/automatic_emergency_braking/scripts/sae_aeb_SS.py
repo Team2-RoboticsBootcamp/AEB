@@ -14,19 +14,18 @@ from matplotlib import pyplot as plt
 # Vehicle parameters
 ANGLE_RANGE = 270           # Hokuyo 10LX has 270 degree scan.
 DISTANCE_THRESHOLD = 3      # Distance threshold before collision (m)
-VELOCITY = 0.5              # Maximum Velocity of the vehicle
+VELOCITY = 0.5              # Maximum Velocity of the vehicle (m/s)
 TIME_THRESHOLD = 1          # Time threshold before collision (s)
 STEERING_ANGLE = 0          # Steering angle is uncontrolled
 
 
 # P-Controller Parameters
 kp_dist = 0.5
-kp_ttc = 1
-
+kp_ttc = 0.1
 dist_error = 0.0
 time_error = 0.0
+initial_value=0.0
 velocity = VELOCITY
-# counter = 0
 
 pub = rospy.Publisher('/vesc/ackermann_cmd_mux/input/teleop', AckermannDriveStamped, queue_size=1)
 
@@ -41,17 +40,6 @@ def dist_control(distance):
 	dist_error = max(distance-DISTANCE_THRESHOLD,0)
 
 	velocity = min(kp_dist*dist_error,VELOCITY)
-	# ---
-	# if counter % 2 == 0:
-	#     plt.plot(counter, distance,'.')
-	#     # plt.axis("equal")
-	#     plt.draw()
-	#     plt.pause(0.00000000001)
-
-	# counter += 1
-
-	# plt.ion()
-	# plt.show()
 
 	print("Distance before collision is = ", distance)
 	print("Vehicle velocity= ", velocity)
@@ -71,13 +59,15 @@ def TTC_control(distance):
 	global velocity
 	# TO-DO: Calculate Time To Collision Error
 	# ---
-
+	TTC= 1000
 	velocity = min(max(velocity-kp_ttc*time_error,0),VELOCITY)
-	TTC = distance/(velocity)
-	
-
+	if velocity >0 and distance/(velocity) < TTC:
+		TTC = distance/(velocity)
+	else: time_error=0.0
 	if TTC < TIME_THRESHOLD:
 		time_error = velocity
+	elif velocity < VELOCITY :
+		time_error= velocity
 	# ---
 		
 	print("Time to collision in seconds is = ", TTC)
@@ -120,8 +110,8 @@ def get_distance(data):
 	# ---
 	#Clip the data to sensor min and max range
 	data.ranges = np.clip(data.ranges, data.range_min, data.range_max)
-	# print('dist1', data.ranges[index_front[0]])
-	# print('dist2', data.ranges[index_front[1]])
+	#print('dist1', data.ranges[index_front[0]])
+	#print('dist2', data.ranges[index_front[1]])
 	#Calc mean
 	avg_dist = np.mean(data.ranges[index_front[0]:index_front[1]])
 	# ---
@@ -135,8 +125,11 @@ def callback(data):
 
 	# TO-DO: Complete the Callback. Get the distance and input it into the controller
 	avg_dist = get_distance(data)
-	# dist_control(avg_dist)
-	TTC_control(avg_dist)
+	opt=rospy.get_param('~control')#Distance control(1) or TTC control(0):"))
+	if opt == 1:
+		dist_control(avg_dist)
+	elif opt==0:
+		TTC_control(avg_dist)
 	# ---
 
 	# ---

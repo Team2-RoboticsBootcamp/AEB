@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <launch>
+   <arg name="control" default="1"/> 
 
  <!-- TO-DO: Bring up the simulator and the code -->
 
@@ -9,7 +10,9 @@
   </include>
 
 <!-- Bring up AEB code -->
-  <node pkg="automatic_emergency_braking" name="aeb_controller" type="sae_aeb_SS.py" output="screen"/>
+  <node pkg="automatic_emergency_braking_t2" name="aeb_controller" type="sae_aeb_SS.py" output="screen">
+  	<param name="control" value="$(arg control)"/>
+  </node>
   <!-- <node pkg="automatic_emergency_braking" name="plotter" type="plotter.py" output="screen"/> -->
 
 </launch>
