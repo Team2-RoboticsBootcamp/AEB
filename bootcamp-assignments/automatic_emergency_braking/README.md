@@ -3,7 +3,7 @@ Schnell Scott
 Contreras Kurt
 Mulrooney Brian
 Bolton Aaron
-#Launch Instructions
+# Launch Instructions
 roslaunch automatic_emergency_braking_t2 aeb.launch control:=0
 # bootcamp-assignments
 Please install the dependencies mentioned below, before building this repository.
