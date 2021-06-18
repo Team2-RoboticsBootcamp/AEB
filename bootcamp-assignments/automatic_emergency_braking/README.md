@@ -4,7 +4,9 @@ Contreras Kurt
 Mulrooney Brian
 Bolton Aaron
 # Launch Instructions
-roslaunch automatic_emergency_braking_t2 aeb.launch control:=0
+To launch use "roslaunch automatic_emergency_braking_t2 aeb.launch control:=0"
+Control = 0 for TTC control
+Control = 1 for Distance Control
 # bootcamp-assignments
 Please install the dependencies mentioned below, before building this repository.
 
