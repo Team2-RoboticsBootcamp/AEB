@@ -18,7 +18,7 @@ frequency=60
 
 # Controller parameters
 kp = 0.7
-kd = 0.001
+kd = 0.01
 
 # Other global variables
 error = 0.0
@@ -62,7 +62,6 @@ def get_index(angle, data):
 	#additional_degrees= 0
 	#indexes= [int(angle+45-additional_degrees)*scans_per_degree,int(angle+45+additional_degrees)*scans_per_degree]
 	indexes= int(angle+45)*scans_per_degree
-	# print('indexes', indexes)
 	return indexes
 	# ---
 
@@ -71,17 +70,18 @@ def distance(angle_right, angle_lookahead, data):
 	global DISTANCE_RIGHT_THRESHOLD
 	# TO-DO: Find index of the two rays, and calculate a, b, alpha and theta. Find the actual distance from the right wall.
 	# ---
-	theta= (((angle_right - angle_lookahead)* math.pi)/180)
+	theta= ((45* math.pi)/180)
 	b_ind = get_index(angle_right, data)
 	a_ind = get_index(angle_lookahead, data)
-	alpha = math.atan((data.ranges[angle_lookahead] * math.cos(theta) - data.ranges[b_ind]) / (data.ranges[angle_lookahead] * math.sin(theta)))
+	alpha = math.atan(((data.ranges[a_ind] * math.cos(theta)) - data.ranges[b_ind]) / (data.ranges[a_ind] * math.sin(theta)))
 	distance_r= data.ranges[b_ind] * math.cos(alpha)
 	
 	# ---
 
 	print ("Distance from right wall :", distance_r)
 	print ("Alpha:", alpha)
-
+	print ("b:", data.ranges[b_ind])
+	print ("a:", data.ranges[a_ind])
 	# Calculate error
 	error = DISTANCE_RIGHT_THRESHOLD - (distance_r + (((1/frequency)*VELOCITY)* math.sin(alpha)))
 
