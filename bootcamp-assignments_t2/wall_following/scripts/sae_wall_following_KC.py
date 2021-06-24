@@ -13,12 +13,13 @@ import pdb
 # Vehicle parameters
 ANGLE_RANGE = 270 				# Hokuyo 10LX has 270 degrees scan
 DISTANCE_RIGHT_THRESHOLD = 0.5 	# (m)
-VELOCITY = 0.3 					# meters per second
-frequency=60
+VELOCITY = 0.5 					# meters per second
+frequency=10
 
 # Controller parameters
-kp = 0.7
-kd = 0.01
+kp = 0.65
+kp_v=0.5
+kd = 0.001
 
 # Other global variables
 error = 0.0
@@ -35,22 +36,25 @@ def control(error):
 	# TO-DO: Implement controller
 	# ---
 	steering_angle= kp*error+kd*(prev_error-error)
+	velocity=VELOCITY-(kp_v*abs(error))
 	# ---
 
 	# Set maximum thresholds for steering angles
 	if steering_angle > 0.5:
 		steering_angle = 0.5
+		
 	elif steering_angle < -0.5:
 		steering_angle = -0.5
 	
 	prev_error=error
 
 	print ("Steering Angle is =",steering_angle )
+	print ("Velocity=", velocity)
 
 	# TO-DO: Publish the message
 	# ---
 	msg = AckermannDriveStamped()
-	msg.drive.speed = VELOCITY
+	msg.drive.speed = velocity
 	msg.drive.steering_angle = steering_angle
 	pub.publish(msg)
 	# ---
@@ -80,10 +84,9 @@ def distance(angle_right, angle_lookahead, data):
 
 	print ("Distance from right wall :", distance_r)
 	print ("Alpha:", alpha)
-	print ("b:", data.ranges[b_ind])
-	print ("a:", data.ranges[a_ind])
 	# Calculate error
 	error = DISTANCE_RIGHT_THRESHOLD - (distance_r + (((1/frequency)*VELOCITY)* math.sin(alpha)))
+	print ("error:", error)
 
 	return error, distance_r
 
